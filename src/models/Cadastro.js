@@ -72,6 +72,10 @@ export default class User extends Model {
     return bcrypt.compare(senha, this.senha_hash);
   }
 
+  static associate(model) {
+    this.hasMany(model.Eleicao, { foreignKey: 'user_id' })
+  }
+
 }
 
 
