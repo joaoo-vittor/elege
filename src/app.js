@@ -29,7 +29,7 @@ class App {
     this.app.use('/', homeRoutes);
     this.app.use('/cadastro/', cadastroRoutes);
     this.app.use('/token/', tokenRouter);
-    this.app.use('/criar-eleicao/', criarEleicaoRouter);
+    this.app.use('/eleicao/', criarEleicaoRouter);
   }
 }
 

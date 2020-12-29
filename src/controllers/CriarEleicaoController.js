@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 import Eleicao from '../models/Eleicoes';
+import TipoCandidato from '../models/TipoCandidato';
 
 class CriarEleicaoController {
   async store(req, res) {
@@ -26,7 +27,30 @@ class CriarEleicaoController {
     try {
       const novaEleicao = await Eleicao.create(objEleicao);
 
-      res.json(novaEleicao);
+      try {
+        let novoTipoCand;
+        let arrTipoCand = [];
+        for (let tipoCand of tipos_candidato) {
+          tipoCand = tipoCand.toLocaleLowerCase();
+
+          novoTipoCand = await TipoCandidato.create({
+            id_user: id,
+            id_eleicao: novaEleicao.id,
+            tipo: tipoCand,
+          });
+
+          arrTipoCand.push(tipoCand);
+        }
+
+        novaEleicao.dataValues.tipos_candidato = arrTipoCand;
+
+        res.json(novaEleicao);
+      } catch(err) {
+        return res.status(400).json({
+          errors: err.errors.map(e => e.message)
+        })
+      }
+
     } catch(err) {
       return res.status(400).json({
         errors: err.errors.map(e => e.message)
@@ -37,6 +61,23 @@ class CriarEleicaoController {
   async index(req, res) {
     try {
       const eleicoes = await Eleicao.findAll();
+      const tiposCandidato = await TipoCandidato.findAll();
+
+
+      eleicoes.map(data => {
+
+        const id_eleicao = data.dataValues.id;
+
+        let arrTiposCandidato = [];
+        tiposCandidato.map(tipos => {
+          if (tipos.dataValues.id_eleicao === id_eleicao) {
+            arrTiposCandidato.push(tipos.dataValues.tipo);
+          }
+        })
+
+        data.dataValues.tipos_candidato = arrTiposCandidato;
+      })
+
       return res.json(eleicoes);
     } catch(err) {
       return res.status(400).json({
@@ -57,6 +98,19 @@ class CriarEleicaoController {
         })
       }
 
+      const idEleicao = eleicao.dataValues.id;
+
+      const tiposCandidato = await TipoCandidato.findAll({
+        where: { id_eleicao: idEleicao }
+      });
+
+      let arrTipoCand = [];
+      tiposCandidato.map(data => {
+        arrTipoCand.push(data.dataValues.tipo);
+      });
+
+      eleicao.dataValues.tipos_candidato = arrTipoCand;
+
       return res.json(eleicao);
     } catch(err) {
       return res.status(400).json({
@@ -64,6 +118,15 @@ class CriarEleicaoController {
       })
     }
   }
+
+  async update(req, res) {
+    return res.json('update');
+  }
+
+  async delete(req, res) {
+    return res.json('delete');
+  }
+
 }
 
 export default new CriarEleicaoController();
