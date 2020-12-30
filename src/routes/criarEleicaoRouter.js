@@ -9,6 +9,5 @@ router.post('/', loginRequired, CriarEleicaoController.store);
 router.get('/:id', loginRequired, CriarEleicaoController.show);
 router.get('/', loginRequired, CriarEleicaoController.index);
 router.put('/:id/update', loginRequired, CriarEleicaoController.update);
-router.put('/:id/delete', loginRequired, CriarEleicaoController.delete);
 
 export default router;

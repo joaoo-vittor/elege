@@ -63,8 +63,8 @@ class CriarEleicaoController {
       const eleicoes = await Eleicao.findAll();
       const tiposCandidato = await TipoCandidato.findAll();
 
-
-      eleicoes.map(data => {
+      let novasEleicoes = [];
+      novasEleicoes = eleicoes.map(data => {
 
         const id_eleicao = data.dataValues.id;
 
@@ -78,7 +78,7 @@ class CriarEleicaoController {
         data.dataValues.tipos_candidato = arrTiposCandidato;
       })
 
-      return res.json(eleicoes);
+      return res.json(novasEleicoes);
     } catch(err) {
       return res.status(400).json({
         errors: err.errors.map(e => e.message)
@@ -120,11 +120,34 @@ class CriarEleicaoController {
   }
 
   async update(req, res) {
-    return res.json('update');
-  }
+    try {
+      const { authorization } = req.headers;
+      const [bearer, token] = authorization.split(' ');
+      const dataToken = jwt.verify(token, process.env.TOKEN_SECRET);
+      const idEleicao = req.params.id;
 
-  async delete(req, res) {
-    return res.json('delete');
+      const eleicao = await Eleicao.findByPk(idEleicao);
+
+      if (eleicao.dataValues.user_id !== dataToken.id) {
+        return res.json({
+          errors: 'Credenciais invalidas para atualizar esta eleicao'
+        });
+      }
+
+      if (eleicao.dataValues.deletado) {
+        return res.json({
+          errors: 'Esta eleicao foi deletada'
+        });
+      }
+
+      const novosDadosEleicao = await eleicao.update(req.body);
+
+      return res.json(novosDadosEleicao);
+    } catch (err) {
+      return res.status(400).json({
+        errors: err.errors.map(e => e.message)
+      })
+    }
   }
 
 }
