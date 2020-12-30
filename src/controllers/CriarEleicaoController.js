@@ -60,7 +60,10 @@ class CriarEleicaoController {
 
   async index(req, res) {
     try {
-      const eleicoes = await Eleicao.findAll();
+      const eleicoes = await Eleicao.findAll({ where: {
+        deletado: 0
+      } });
+
       const tiposCandidato = await TipoCandidato.findAll();
 
       let novasEleicoes = [];
@@ -76,6 +79,7 @@ class CriarEleicaoController {
         })
 
         data.dataValues.tipos_candidato = arrTiposCandidato;
+        return data;
       })
 
       return res.json(novasEleicoes);
