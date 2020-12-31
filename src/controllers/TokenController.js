@@ -13,17 +13,18 @@ class TokenController {
 
     const user = await User.findOne({ where: { email }});
 
-    if (user.dataValues.deletado) {
-      return res.status(401).json({
-        errors: 'Usuario deletado',
-      })
-    }
-
     if (!user) {
       return res.status(401).json({
         errors: ['Usuario não existe'],
-      })
+      });
     }
+
+    if (user.dataValues.deletado) {
+      return res.status(401).json({
+        errors: 'Usuario deletado',
+      });
+    }
+
 
     if (!(await user.senhaValida(senha))) {
       return res.status(401).json({

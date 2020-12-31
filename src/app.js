@@ -8,9 +8,10 @@ import { resolve } from 'path';
 
 
 import homeRoutes from './routes/homeRoute';
-import cadastroRoutes from './routes/cadastroRouter';
+import cadastroRouter from './routes/cadastroRouter';
 import tokenRouter from './routes/tokenRouter';
 import criarEleicaoRouter from './routes/criarEleicaoRouter';
+import candidatoRouter from './routes/criarCandidato';
 
 
 class App {
@@ -27,9 +28,10 @@ class App {
 
   routes() {
     this.app.use('/', homeRoutes);
-    this.app.use('/cadastro/', cadastroRoutes);
+    this.app.use('/cadastro/', cadastroRouter);
     this.app.use('/token/', tokenRouter);
     this.app.use('/eleicao/', criarEleicaoRouter);
+    this.app.use('/candidato/', candidatoRouter);
   }
 }
 

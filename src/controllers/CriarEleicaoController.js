@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 
 import Eleicao from '../models/Eleicoes';
 import TipoCandidato from '../models/TipoCandidato';
@@ -60,9 +61,19 @@ class CriarEleicaoController {
 
   async index(req, res) {
     try {
-      const eleicoes = await Eleicao.findAll({ where: {
-        deletado: 0
-      } });
+      const { authorization } = req.headers;
+      const [bearer, token] = authorization.split(' ');
+      const dataToken = jwt.verify(token, process.env.TOKEN_SECRET);
+
+
+      const eleicoes = await Eleicao.findAll({
+          where: {
+            [Op.and]: [
+              { user_id: dataToken.id },
+              { deletado: 0 }
+            ]
+          }
+      });
 
       const tiposCandidato = await TipoCandidato.findAll();
 

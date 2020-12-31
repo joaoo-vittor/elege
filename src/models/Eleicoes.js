@@ -51,4 +51,8 @@ export default class Eleicao extends Model {
   static associateTipoCandidato(models) {
     this.hasMany(models.TipoCandidato, { foreignKey: 'id_eleicao' });
   }
+
+  static associateCandidato(models) {
+    this.hasMany(models.Candidato, { foreignKey: 'id_eleicao' });
+  }
 }
