@@ -69,7 +69,43 @@ class CandidatoController {
   }
 
   async update(req, res) {
-    return res.json('update');
+    const authorization = req.headers.authorization;
+    const [bearer, token] = authorization.split(' ');
+    const dataToken = jwt.verify(token, process.env.TOKEN_SECRET);
+    const objUpdate = { ...req.body };
+
+    const candidato = await Candidato.findOne({
+      where: {
+        [Op.and]: [
+          { id: req.params.id },
+          { id_user: dataToken.id }
+        ]
+      }
+    });
+
+    let numero;
+    if (objUpdate.numero) {
+      numero = await Candidato.findOne({
+        where: {
+          [Op.and]: [
+            { numero: objUpdate.numero },
+            { id_user: dataToken.id }
+          ]
+        }
+      });
+    }
+
+    if (numero) {
+      return res.json({ errors: 'Já existe um candidato com esse numero' });
+    }
+
+    if (objUpdate.tipo.toLowerCase() === 'chapa' && !objUpdate.nome_vice) {
+      return res.json({ errors: 'Nome do vice não pode ficar vazio' });
+    }
+
+    const candidatoUpdate = await candidato.update(objUpdate);
+
+    return res.json(candidatoUpdate);
   }
 }
 
